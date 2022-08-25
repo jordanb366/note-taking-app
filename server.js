@@ -40,7 +40,7 @@ app.post("/api/notes", (req, res) => {
   const newBody = {
     title,
     text,
-    note_id: uuidv4(),
+    id: uuidv4(),
   };
 
   // Obtain existing DB files
@@ -66,6 +66,33 @@ app.post("/api/notes", (req, res) => {
     }
   });
 });
+
+// app.delete("/api/notes/:id", (req, res) => {
+//   const requestedID = req.params.id.toLowerCase();
+
+//   // Obtain existing DB files
+//   fs.readFile("./db/db.json", "utf8", (err, data) => {
+//     if (err) {
+//       console.error(err);
+//     } else {
+//       // Convert string into JSON object
+//       const parsedDB = JSON.parse(data);
+
+//       // Add a new note
+//       parsedDB.push(requestedID);
+
+//       // Write updated notes back to the file
+//       fs.writeFile(
+//         "./db/db.json",
+//         JSON.stringify(requestedID, null, 4),
+//         (writeErr) =>
+//           writeErr
+//             ? console.error(writeErr)
+//             : console.info("Successfully delted notes!")
+//       );
+//     }
+//   });
+// });
 
 app.listen(PORT, () =>
   console.log(`App listening at http://localhost:${PORT} 🚀`)

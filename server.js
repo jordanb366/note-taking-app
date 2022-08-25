@@ -27,7 +27,18 @@ app.get("/notes", (req, res) =>
 );
 
 app.get("/api/notes", (req, res) => {
-  return res.json(notesDB);
+  // res.json(notesDB);
+  // Obtain existing DB files
+  fs.readFile("./db/db.json", "utf8", (err, data) => {
+    if (err) {
+      console.error(err);
+    } else {
+      // Convert string into JSON object
+      const parsedDB = JSON.parse(data);
+
+      res.json(parsedDB);
+    }
+  });
 });
 
 // Post notes
@@ -84,12 +95,9 @@ app.delete("/api/notes/:id", (req, res) => {
 
       const index = parsedDB.findIndex((index) => index.id === requestedID);
 
-      if (index !== undefined) {
-        parsedDB.splice(index, 1);
-      }
+      if (index !== undefined) parsedDB.splice(index, 1);
 
       console.log(parsedDB);
-      parsedDB.push(requestedID);
 
       // Write updated notes back to the file
       fs.writeFile(
@@ -98,10 +106,11 @@ app.delete("/api/notes/:id", (req, res) => {
         (writeErr) =>
           writeErr
             ? console.error(writeErr)
-            : console.info("Successfully delted notes!")
+            : console.info("Successfully deleted notes!")
       );
     }
   });
+  res.json(notesDB);
 });
 
 app.listen(PORT, () =>

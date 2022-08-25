@@ -1,6 +1,8 @@
 const express = require("express");
 const path = require("path");
 const notesDB = require("./db/db.json");
+const fs = require("fs");
+const { v4: uuidv4 } = require("uuid");
 
 const PORT = process.env.PORT || 3001;
 
@@ -32,6 +34,37 @@ app.post("/api/notes", (req, res) => {
   notesDB.push(body);
   res.json(notesDB);
   console.log(typeof body);
+
+  const { title, text } = req.body;
+
+  const newBody = {
+    title,
+    text,
+    note_id: uuidv4(),
+  };
+
+  // Obtain existing DB files
+  fs.readFile("./db/db.json", "utf8", (err, data) => {
+    if (err) {
+      console.error(err);
+    } else {
+      // Convert string into JSON object
+      const parsedDB = JSON.parse(data);
+
+      // Add a new note
+      parsedDB.push(newBody);
+
+      // Write updated notes back to the file
+      fs.writeFile(
+        "./db/db.json",
+        JSON.stringify(parsedDB, null, 4),
+        (writeErr) =>
+          writeErr
+            ? console.error(writeErr)
+            : console.info("Successfully updated notes!")
+      );
+    }
+  });
 });
 
 app.listen(PORT, () =>

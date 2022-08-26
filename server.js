@@ -35,7 +35,6 @@ app.get("/api/notes", (req, res) => {
     } else {
       // Convert string into JSON object
       const parsedDB = JSON.parse(data);
-
       res.json(parsedDB);
     }
   });
@@ -93,11 +92,17 @@ app.delete("/api/notes/:id", (req, res) => {
       // Convert string into JSON object
       const parsedDB = JSON.parse(data);
 
-      const index = parsedDB.findIndex((index) => index.id === requestedID);
+      // const index = parsedDB.findIndex((index) => index.id === requestedID);
 
-      if (index !== undefined) parsedDB.splice(index, 1);
+      // if (index !== undefined) parsedDB.splice(index, 1);
 
-      console.log(parsedDB);
+      // console.log(parsedDB[1].id);
+      for (let i = 0; i < parsedDB.length; i++) {
+        if (parsedDB[i].id === requestedID) {
+          parsedDB.splice(i, 1);
+          console.log(parsedDB);
+        }
+      }
 
       // Write updated notes back to the file
       fs.writeFile(

@@ -1,11 +1,14 @@
+// All imports for express, path, notes db, fs and uuid for the unique id in the db
 const express = require("express");
 const path = require("path");
 const notesDB = require("./db/db.json");
 const fs = require("fs");
 const { v4: uuidv4 } = require("uuid");
 
+// Port for deployment and local 3001 port
 const PORT = process.env.PORT || 3001;
 
+// App variable for express
 const app = express();
 
 // Import custom middleware, "cLog"
@@ -26,6 +29,7 @@ app.get("/notes", (req, res) =>
   res.sendFile(path.join(__dirname, "/public/notes.html"))
 );
 
+// Get api notes routes
 app.get("/api/notes", (req, res) => {
   // res.json(notesDB);
   // Obtain existing DB files
@@ -40,7 +44,7 @@ app.get("/api/notes", (req, res) => {
   });
 });
 
-// Post notes
+// Post api notes route
 app.post("/api/notes", (req, res) => {
   const { body } = req;
   notesDB.push(body);

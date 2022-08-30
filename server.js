@@ -38,14 +38,14 @@ app.post("/api/notes", (req, res) => {
   // Gets the req.body
   const { title, text } = req.body;
   // Saves Body of the req in the format as below
-  const newBody = {
+  const newNoteToSave = {
     title,
     text,
     id: uuidv4(),
   };
 
   //  Pushes to the array notesDB
-  notesDB.push(newBody);
+  notesDB.push(newNoteToSave);
 
   // Write updated notes back to the file
   fs.writeFile("./db/db.json", JSON.stringify(notesDB, null, 4), (writeErr) =>

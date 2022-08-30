@@ -35,7 +35,7 @@ app.get("/api/notes", (req, res) => {
 
 // Post api notes route
 app.post("/api/notes", (req, res) => {
-  // Gets the req.body
+  // Gets the req.body and destructuring what is in the req.body
   const { title, text } = req.body;
   // Saves Body of the req in the format as below
   const newNoteToSave = {

@@ -1,7 +1,8 @@
 // All imports for express, path, notes db, fs and uuid for the unique id in the db
 const express = require("express");
 const path = require("path");
-const notesDB = require("./db/db.json");
+// Using let instead of const
+let notesDB = require("./db/db.json");
 const fs = require("fs");
 const { v4: uuidv4 } = require("uuid");
 
@@ -11,12 +12,10 @@ const PORT = process.env.PORT || 3001;
 // App variable for express
 const app = express();
 
-// Import custom middleware, "cLog"
-
 // Middleware for parsing JSON and urlencoded form data
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
+// For the public path folder
 app.use(express.static("public"));
 
 // GET Route for homepage
@@ -31,97 +30,64 @@ app.get("/notes", (req, res) =>
 
 // Get api notes routes
 app.get("/api/notes", (req, res) => {
-  // res.json(notesDB);
-  // Obtain existing DB files
-  fs.readFile("./db/db.json", "utf8", (err, data) => {
-    if (err) {
-      console.error(err);
-    } else {
-      // Convert string into JSON object
-      const parsedDB = JSON.parse(data);
-      res.json(parsedDB);
-    }
-  });
+  res.json(notesDB);
 });
 
 // Post api notes route
 app.post("/api/notes", (req, res) => {
-  const { body } = req;
-  notesDB.push(body);
-  res.json(notesDB);
-  console.log(typeof body);
-
+  // Gets the req.body
   const { title, text } = req.body;
-
+  // Saves Body of the req in the format as below
   const newBody = {
     title,
     text,
     id: uuidv4(),
   };
 
-  // Obtain existing DB files
-  fs.readFile("./db/db.json", "utf8", (err, data) => {
-    if (err) {
-      console.error(err);
-    } else {
-      // Convert string into JSON object
-      const parsedDB = JSON.parse(data);
+  //  Pushes to the array notesDB
+  notesDB.push(newBody);
 
-      // Add a new note
-      parsedDB.push(newBody);
-
-      // Write updated notes back to the file
-      fs.writeFile(
-        "./db/db.json",
-        JSON.stringify(parsedDB, null, 4),
-        (writeErr) =>
-          writeErr
-            ? console.error(writeErr)
-            : console.info("Successfully updated notes!")
-      );
-    }
-  });
+  // Write updated notes back to the file
+  fs.writeFile("./db/db.json", JSON.stringify(notesDB, null, 4), (writeErr) =>
+    writeErr
+      ? console.error(writeErr)
+      : console.info("Successfully updated notes!")
+  );
+  // Reads the file
+  res.json(notesDB);
 });
 
 // Handles the delete route
 app.delete("/api/notes/:id", (req, res) => {
-  const requestedID = req.params.id.toLowerCase();
-
+  // Saves teh req params id to variable
+  const requestedID = req.params.id;
+  // Logs the param id
   console.log(requestedID);
-  // Obtain existing DB files
-  fs.readFile("./db/db.json", "utf8", (err, data) => {
-    if (err) {
-      console.error(err);
-    } else {
-      // Convert string into JSON object
-      const parsedDB = JSON.parse(data);
 
-      // const index = parsedDB.findIndex((index) => index.id === requestedID);
-
-      // if (index !== undefined) parsedDB.splice(index, 1);
-
-      // console.log(parsedDB[1].id);
-      for (let i = 0; i < parsedDB.length; i++) {
-        if (parsedDB[i].id === requestedID) {
-          parsedDB.splice(i, 1);
-          console.log(parsedDB);
-        }
-      }
-
-      // Write updated notes back to the file
-      fs.writeFile(
-        "./db/db.json",
-        JSON.stringify(parsedDB, null, 4),
-        (writeErr) =>
-          writeErr
-            ? console.error(writeErr)
-            : console.info("Successfully deleted notes!")
-      );
-    }
+  // Filters out the noteDB array to filter out the requestedID to delete
+  let newNotes = notesDB.filter((note) => {
+    return note.id !== requestedID;
   });
+  // Sets notesDB equal to newNote,
+  notesDB = newNotes;
+
+  // Write updated notes back to the file,
+  // Using writeFileSync to clean up code
+  fs.writeFileSync(
+    "./db/db.json",
+    JSON.stringify(notesDB, null, 4),
+    console.log("Successfully deleted the note")
+  );
+  // Read file
   res.json(notesDB);
 });
 
+// Wildcard redirect
+app.get("*", (req, res) =>
+  res.sendFile(path.join(__dirname, "/public/index.html"))
+);
+
+// Listening port
 app.listen(PORT, () =>
   console.log(`App listening at http://localhost:${PORT} 🚀`)
 );
